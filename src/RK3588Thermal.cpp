@@ -1,4 +1,7 @@
 #include "RK3588Thermal.h"
+#include <iostream>
+
+using namespace std;
 
 /**
  * 构造函数
@@ -14,6 +17,7 @@ RK3588Thermal::RK3588Thermal(struct ThermalConfig config) : config(config) {
         sensor.temperature = 0.0f;
         sensor.isAlert = false;
         this->sensors.push_back(sensor);
+        cout << "Sensor " << i << " type: " << sensor.type << endl;
     }
 }
 
@@ -28,10 +32,11 @@ RK3588Thermal::~RK3588Thermal() {
  * 获取指定传感器的温度
  * @param sensorIndex 传感器索引
  * @return 温度值
+ * @note 读取/sys/class/thermal/thermal_zoneX/temp
  */
 float RK3588Thermal::getTemperature(int sensorIndex) const {
     validateSensorIndex(sensorIndex);
-    return readTemperatureFromFile(THERMAL_PATH + std::to_string(sensorIndex) + "/temp");
+    return readTemperatureFromFile(THERMAL_PATH + std::string("thermal_zone") + std::to_string(sensorIndex) + "/temp");
 }
 
 /**
@@ -50,6 +55,31 @@ std::vector<float> RK3588Thermal::getAllTemperatures() const {
 }
 
 /**
+ * 获取所有传感器数据
+ * @return 传感器数据列表
+ */
+std::vector<ThermalSensor> RK3588Thermal::getAllSensors() {
+    try{
+        for (int i = 0; i < config.MAX_SENSORS; i++) {
+            // 获取温度
+            sensors[i].temperature = getTemperature(i);
+            // 检查温度是否在报警范围内
+            if (sensors[i].temperature < config.MIN_TEMP || sensors[i].temperature > config.MAX_TEMP) {
+                sensors[i].isAlert = true;
+            }
+            else {
+                sensors[i].isAlert = false;
+            }
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "获取传感器数据失败: " << e.what() << std::endl;
+    }
+
+    return this->sensors;
+}
+
+/**
  * 从文件读取温度值
  * @param path 传感器文件路径
  * @return 温度值
@@ -64,9 +94,9 @@ float RK3588Thermal::readTemperatureFromFile(const std::string& path) const {
     int rawTemp;
     file >> rawTemp;
     
-    float temp = static_cast<float>(rawTemp) / ThermalConfig::TEMP_SCALE;
+    float temp = static_cast<float>(rawTemp) / config.TEMP_SCALE;
     
-    if (temp < ThermalConfig::MIN_TEMP || temp > ThermalConfig::MAX_TEMP) {
+    if (temp < config.MIN_TEMP || temp > config.MAX_TEMP) {
         throw std::runtime_error("温度值超出有效范围");
     }
     
@@ -90,7 +120,7 @@ void RK3588Thermal::validateSensorIndex(int sensorIndex) const {
  * @note 读取/sys/class/thermal/thermal_zoneX/type
  */
 ThermalSensorType RK3588Thermal::getSensorType(int sensorIndex) const {
-    std::string path = THERMAL_PATH + std::to_string(sensorIndex) + "/type";
+    std::string path = THERMAL_PATH + std::string("thermal_zone") + std::to_string(sensorIndex) + "/type";
     std::ifstream file(path);
     if (!file.is_open()) {
         throw std::runtime_error("无法打开传感器类型文件: " + path);

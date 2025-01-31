@@ -1,17 +1,22 @@
 {
-    "configurations": [
-        {
-            "name": "Linux",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "/usr/include"
-            ],
-            "defines": [],
-            "compilerPath": "/usr/bin/gcc",
-            "cStandard": "c17",
-            "cppStandard": "gnu++17",
-            "intelliSenseMode": "linux-gcc-arm64"
-        }
-    ],
-    "version": 4
+  "configurations": [
+    {
+      "name": "linux-gcc-arm64",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "/usr/include",
+        "${workspaceFolder}/src",
+        "/usr/include/aarch64-linux-gnu/qt5",
+        "/usr/include/aarch64-linux-gnu/qt5/QtWidgets",
+        "/usr/include/aarch64-linux-gnu/qt5/QtCore",
+        "/usr/include/aarch64-linux-gnu/qt5/QtGui"
+      ],
+      "defines": [],
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "c17",
+      "cppStandard": "gnu++17",
+      "intelliSenseMode": "linux-gcc-arm64"
+    }
+  ],
+  "version": 4
 }

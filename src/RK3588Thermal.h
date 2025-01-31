@@ -19,12 +19,12 @@ enum ThermalSensorType {
 };
 
 // RK3588 温度传感器配置信息
-struct ThermalConfig {
-    static int MAX_SENSORS;       // 最大传感器数量
-    static int TEMP_SCALE;        // 温度缩放因子
-    static float MIN_TEMP;        // 最低温度限制
-    static float MAX_TEMP;        // 最高温度限制
-};
+typedef struct ThermalConfig {
+    int MAX_SENSORS;       // 最大传感器数量
+    int TEMP_SCALE;        // 温度缩放因子
+    float MIN_TEMP;        // 最低温度限制
+    float MAX_TEMP;        // 最高温度限制
+} ThermalConfig;
 
 // 温度传感器数据结构
 struct ThermalSensor {
@@ -46,6 +46,9 @@ public:
     
     // 获取所有传感器的温度
     std::vector<float> getAllTemperatures() const;
+
+    // 获取所有传感器数据
+    std::vector<ThermalSensor> getAllSensors();
 
 private:
     struct ThermalConfig config; // 温度传感器配置信息
