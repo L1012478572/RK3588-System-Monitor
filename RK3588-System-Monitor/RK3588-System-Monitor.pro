@@ -11,6 +11,7 @@ CONFIG += c++11
 SOURCES += \
     ../src/Memory.cpp \
     ../src/RK3588Thermal.cpp \
+    ui_src/MemoryLabel.cpp \
     ui_src/ThermalLabel.cpp \
     main.cpp \
     mainwindow.cpp
@@ -18,6 +19,7 @@ SOURCES += \
 HEADERS += \
     ../src/Memory.h \
     ../src/RK3588Thermal.h \
+    ui_src/MemoryLabel.h \
     ui_src/ThermalLabel.h \
     mainwindow.h
 

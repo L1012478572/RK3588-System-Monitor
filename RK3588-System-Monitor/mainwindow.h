@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QTimer>
 #include "ui_src/ThermalLabel.h"
+#include "ui_src/MemoryLabel.h"
 #include "RK3588Thermal.h"
+#include "Memory.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,6 +33,8 @@ private:
     QTimer *timer;
     // 温度传感器
     RK3588Thermal *thermal;
+    // 内存传感器
+    Memory *memory;
     // 标签
     ThermalLabel *average_label;
     ThermalLabel *cpuBig0_label;
@@ -38,5 +42,6 @@ private:
     ThermalLabel *cpuSmall_label;
     ThermalLabel *gpu_label;
     ThermalLabel *npu_label;
+    MemoryLabel *memory_label;
 };
 #endif // MAINWINDOW_H

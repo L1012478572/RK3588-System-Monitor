@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     };
     thermal = new RK3588Thermal(thermal_config);
 
+    // 初始化内存传感器
+    memory = new Memory();
+
     // 初始化定时器
     timer = new QTimer(this);
     timer->start(1000);
@@ -50,12 +53,14 @@ MainWindow::~MainWindow()
     delete ui;
     delete timer;
     delete thermal; 
+    delete memory;
     delete average_label;
     delete cpuBig0_label;
     delete cpuBig1_label;
     delete cpuSmall_label;
     delete gpu_label;
     delete npu_label;
+    delete memory_label;
 }
 
 /**
@@ -83,6 +88,8 @@ void MainWindow::init_label()
     gpu_label = new ThermalLabel(this);
     // 创建标签 NPU
     npu_label = new ThermalLabel(this);
+    // 创建标签 内存
+    memory_label = new MemoryLabel(this);
 
     average_label->set_label_name("AVE");
     average_label->move(10, 10);    // 设置标签位置  0，0
@@ -119,6 +126,12 @@ void MainWindow::init_label()
     npu_label->set_temperature(25.0);   // 设置温度
     npu_label->set_temperature_alarm(-10.0f, 60.0f);   // 设置温度报警范围      
     npu_label->set_label_size((window_width / 2 - 20), (window_height / 4 - 20));   // 设置标签尺寸  
+
+    memory_label->set_label_name("Memory");
+    memory_label->move(10, (window_height / 4 * 3 )+ 10);    // 设置标签位置 3， 0
+    memory_label->set_memory_usage(25.0);   // 设置内存使用率
+    memory_label->set_memory_alarm(80.0);   // 设置内存使用率报警范围      
+    memory_label->set_label_size((window_width / 2 - 20), (window_height / 4 - 20));   // 设置标签尺寸  
  
 }
 
@@ -152,6 +165,10 @@ void MainWindow::timer_slot()
                 npu_label->set_temperature(sensors[i].temperature);
             }
         }
+
+        // 更新内存标签
+        memory->updateMemoryInfo();
+        memory_label->set_memory_usage(memory->getMemoryUsagePercentage());
     }
     catch (const std::exception& e) {
         qDebug() << "获取传感器数据失败: " << e.what();
