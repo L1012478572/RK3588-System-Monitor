@@ -5,8 +5,10 @@
 #include <QTimer>
 #include "ui_src/ThermalLabel.h"
 #include "ui_src/MemoryLabel.h"
+#include "ui_src/CpuUsageLabel.h"
 #include "RK3588Thermal.h"
 #include "Memory.h"
+#include "CPUUsage.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,6 +37,8 @@ private:
     RK3588Thermal *thermal;
     // 内存传感器
     Memory *memory;
+    // CPU使用率
+    CPUUsage *cpu_usage;
     // 标签
     ThermalLabel *average_label;
     ThermalLabel *cpuBig0_label;
@@ -43,5 +47,6 @@ private:
     ThermalLabel *gpu_label;
     ThermalLabel *npu_label;
     MemoryLabel *memory_label;
+    CpuUsageLabel *cpu_usage_label;
 };
 #endif // MAINWINDOW_H

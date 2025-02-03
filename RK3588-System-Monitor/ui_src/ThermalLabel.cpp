@@ -81,27 +81,33 @@ void ThermalLabel::set_temperature_alarm(float temperature_alarm_min, float temp
  */
 void ThermalLabel::paintEvent(QPaintEvent *event)
 {
-    // 获取label的位置  
-    // QPoint pos = this->pos();
     QPainter painter(this);
+
+    // 设置背景颜色为黑色
+    painter.fillRect(rect(), Qt::black);
+
     // 设置字体
     QFont font("Arial", 10);
     painter.setFont(font);
+
+    // 设置标签名称颜色为白色
+    painter.setPen(Qt::white);
     // 在左上角绘制标签名称
-    // painter.drawText(pos.x() + 10, pos.y() + 10, label_name);
     painter.drawText(10, 10, label_name);
 
     // 设置字体为20
     QFont font2("Arial", 20);
     painter.setFont(font2);
+
+    // 计算温度颜色（绿色到红色的渐变）
+    int red = static_cast<int>(((temperature - temperature_alarm_min) / (temperature_alarm_max - temperature_alarm_min)) * 255);
+    red = qBound(0, red, 255); // 限制red在0到255之间
+    int green = 255 - red;
+    QColor temperatureColor(red, green, 0);
+
+    // 设置温度颜色
+    painter.setPen(temperatureColor);
+
     // 在右下角绘制温度 温度值大小占label的3/5
-    if (temperature >= temperature_alarm_min && temperature <= temperature_alarm_max)
-    {
-        painter.setPen(Qt::green);
-    }
-    else
-    {
-        painter.setPen(Qt::red);
-    }
-    painter.drawText(label_width * 2 / 5-10, label_height * 3 / 5, QString("%1").arg(temperature, 0, 'f', 1)); // 保留一位小数
+    painter.drawText(label_width * 2 / 5 - 10, label_height * 3 / 5, QString("%1").arg(temperature, 0, 'f', 1)); // 保留一位小数
 }

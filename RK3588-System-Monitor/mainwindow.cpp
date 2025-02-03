@@ -20,9 +20,15 @@ MainWindow::MainWindow(QWidget *parent)
     // 设置窗口大小
     this->setFixedSize(200, 400);
     // 设置窗口无边框
-    this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
     // 设置窗口位置 右上角
     this->move(QApplication::desktop()->width() - this->width(), 0);
+
+    // 设置背景颜色为灰褐色
+    this->setStyleSheet("background-color: #8B4513;");
+
+    // 设置窗口固定在最顶层 其他窗口无法掩盖
+    this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
 
     // 初始化标签
     init_label();
@@ -38,6 +44,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 初始化内存传感器
     memory = new Memory();
+
+    // 初始化CPU使用率
+    cpu_usage = new CPUUsage();
+    double usage = cpu_usage->GetUsage();
 
     // 初始化定时器
     timer = new QTimer(this);
@@ -61,6 +71,8 @@ MainWindow::~MainWindow()
     delete gpu_label;
     delete npu_label;
     delete memory_label;
+    delete cpu_usage_label;
+    delete cpu_usage;
 }
 
 /**
@@ -90,6 +102,8 @@ void MainWindow::init_label()
     npu_label = new ThermalLabel(this);
     // 创建标签 内存
     memory_label = new MemoryLabel(this);
+    // 创建标签 CPU使用率
+    cpu_usage_label = new CpuUsageLabel(this);
 
     average_label->set_label_name("AVE");
     average_label->move(10, 10);    // 设置标签位置  0，0
@@ -132,6 +146,12 @@ void MainWindow::init_label()
     memory_label->set_memory_usage(25.0);   // 设置内存使用率
     memory_label->set_memory_alarm(80.0);   // 设置内存使用率报警范围      
     memory_label->set_label_size((window_width / 2 - 20), (window_height / 4 - 20));   // 设置标签尺寸  
+
+    cpu_usage_label->set_label_name("CpuUsage");
+    cpu_usage_label->move(window_width / 2 + 10, (window_height / 4 * 3 )+ 10);    // 设置标签位置 3， 1
+    cpu_usage_label->set_cpu_usage(25.0);   // 设置CPU使用率
+    cpu_usage_label->set_cpu_alarm(80.0);   // 设置CPU使用率报警阈值      
+    cpu_usage_label->set_label_size((window_width / 2 - 20), (window_height / 4 - 20));   // 设置标签尺寸  
  
 }
 
@@ -169,6 +189,9 @@ void MainWindow::timer_slot()
         // 更新内存标签
         memory->updateMemoryInfo();
         memory_label->set_memory_usage(memory->getMemoryUsagePercentage());
+
+        // 更新CPU使用率标签
+        cpu_usage_label->set_cpu_usage(static_cast<float>(cpu_usage->GetUsage()));
     }
     catch (const std::exception& e) {
         qDebug() << "获取传感器数据失败: " << e.what();
